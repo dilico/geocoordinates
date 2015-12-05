@@ -55,8 +55,8 @@
           (recur new-φ new-arc))
         (calculate-φ arc φ)))))
 
-(defn- compute-parameters
-  "Compute the parameters used in the conversion."
+(defn- compute-easting-northing-conversion-parameters
+  "Compute the parameters used in the conversion from easting and northing."
   [easting northing constants]
   (let [af0 (* (:semi-major-axis-a (:ellipsoid-constants constants))
                (:scale-factor-on-central-meridian-f0 (:transverse-mercator-projection-constants constants)))
@@ -85,7 +85,7 @@
   "Un-project Transverse Mercator easting and northing back to latitude."
   [easting northing constants]
   (let [{af0 :af0 bf0 :bf0 e2 :e2 n :n et :et φd :φd ν :ν ρ :ρ η2 :η2}
-        (compute-parameters easting northing constants)
+        (compute-easting-northing-conversion-parameters easting northing constants)
         VII (/ (math/tan φd) (* 2 ρ ν))
         VIII (* (/ (math/tan φd) (* 24 ρ (math/exp ν 3)))
                 (+ 5 (* 3 (math/exp (math/tan φd) 2)) (- η2 (* 9 η2 (math/exp (math/tan φd) 2)))))
@@ -99,7 +99,7 @@
   "Un-project Transverse Mercator easting and northing back to longitude."
   [easting northing constants]
   (let [{af0 :af0 bf0 :bf0 e2 :e2 n :n et :et φd :φd ν :ν ρ :ρ η2 :η2}
-        (compute-parameters easting northing constants)
+        (compute-easting-northing-conversion-parameters easting northing constants)
         λ0 (math/decimal-degrees->radians (:true-origin-longitude-λ0
                                            (:transverse-mercator-projection-constants
                                             constants)))
@@ -117,6 +117,7 @@
        (- (+ (- (+ λ0 (* et X)) (* (math/exp et 3) XI)) (* (math/exp et 5) XII)) (* (math/exp et 7) XIIA)))))
 
 (defn easting-northing->latitude-longitude
+  "Convert easting and northing to latitude and longitude (in decimal degrees)."
   ([{easting :easting northing :northing}]
    (easting-northing->latitude-longitude {:easting easting
                                           :northing northing}
@@ -124,3 +125,74 @@
   ([{easting :easting northing :northing} constants]
    {:latitude (easting-northing->latitude easting northing constants)
     :longitude (easting-northing->longitude easting northing constants)}))
+
+(defn- compute-latitude-longitude-conversion-parameters
+  "Compute the parameters used in the conversion from latitude and longitude."
+  [latitude longitude constants]
+  (let [af0 (* (:semi-major-axis-a (:ellipsoid-constants constants))
+               (:scale-factor-on-central-meridian-f0 (:transverse-mercator-projection-constants constants)))
+        bf0 (* (:semi-minor-axis-b (:ellipsoid-constants constants))
+               (:scale-factor-on-central-meridian-f0 (:transverse-mercator-projection-constants constants)))
+        e2 (/ (- (math/exp af0 2) (math/exp bf0 2)) (math/exp af0 2))
+        n (/ (- af0 bf0) (+ af0 bf0))
+        φd (math/decimal-degrees->radians latitude)
+        ν (/ af0 
+             (math/sqrt (- 1 (* e2 (math/exp (math/sin φd) 2)))))
+        ρ (/ (* ν (- 1 e2))
+             (- 1 (* e2 (math/exp (math/sin φd) 2))))
+        η2 (- (/ ν ρ) 1)
+        p (- (math/decimal-degrees->radians longitude)
+             (math/decimal-degrees->radians (:true-origin-longitude-λ0
+                                             (:transverse-mercator-projection-constants
+                                              constants))))]
+    
+    {:af0 af0 :bf0 bf0 :e2 e2 :n n :φd φd :ν ν :ρ ρ :η2 η2 :p p}))
+
+(defn- latitude-longitude->easting
+  "Project latitude and longitude to Transverse Mercator easting."
+  [latitude longitude constants]
+  (let [{af0 :af0 bf0 :bf0 e2 :e2 n :n φd :φd ν :ν ρ :ρ η2 :η2 p :p}
+        (compute-latitude-longitude-conversion-parameters latitude longitude constants)
+        IV (* ν (math/cos φd))
+        V (* (/ ν 6)
+             (math/exp (math/cos φd) 3)
+             (- (/ ν ρ) (math/exp (math/tan φd) 2)))
+        VI (* (/ ν 120) 
+              (math/exp (math/cos φd) 5)
+              (- (+ (- 5 (* 18 (math/exp (math/tan φd) 2)))
+                    (math/exp (math/tan φd) 4)
+                    (* 14 η2))
+                 (* 58 (math/exp (math/tan φd) 2) η2)))]
+    (+ (:true-origin-easting-e0 (:transverse-mercator-projection-constants constants))
+       (* p IV)
+       (* (math/exp p 3) V)
+       (* (math/exp p 5) VI))))
+
+(defn- latitude-longitude->northing
+  "Project latitude and longitude to Transverse Mercator northing."
+  [latitude longitude constants]
+  (let [{af0 :af0 bf0 :bf0 e2 :e2 n :n φd :φd ν :ν ρ :ρ η2 :η2 p :p}
+        (compute-latitude-longitude-conversion-parameters latitude longitude constants)
+        φ0 (math/decimal-degrees->radians (:true-origin-latitude-φ0
+                                           (:transverse-mercator-projection-constants
+                                            constants)))
+        arc (meridional-arc bf0 n φ0 φd)
+        I (+ arc (:true-origin-northing-n0
+                  (:transverse-mercator-projection-constants
+                   constants)))
+        II (* (/ ν 2) (math/sin φd) (math/cos φd))
+        III (* (/ ν 24) (math/sin φd) (math/exp (math/cos φd) 3) 
+               (+ (- 5 (math/exp (math/tan φd) 2)) (* 9 η2)))
+        IIIA (* (/ ν 720) (math/sin φd) (math/exp (math/cos φd) 5) 
+                (+ (- 61 (* 58 (math/exp (math/tan φd) 2))) (math/exp (math/tan φd) 4)))]
+    (+ I (* (math/exp p 2) II) (* (math/exp p 4) III) (* (math/exp p 6) IIIA))))
+
+(defn latitude-longitude->easting-northing
+  "Convert latitude and longitude (in decimal degrees) to easting and northing."
+  ([{latitude :latitude longitude :longitude}]
+   (latitude-longitude->easting-northing {:latitude latitude
+                                          :longitude longitude}
+                                         national-grid-constants))
+  ([{latitude :latitude longitude :longitude} constants]
+   {:easting (latitude-longitude->easting latitude longitude constants)
+    :northing (latitude-longitude->northing latitude longitude constants)}))
