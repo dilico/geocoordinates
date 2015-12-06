@@ -8,6 +8,12 @@ The guide also explains the limitations of this type of datum transformation, in
 Available calculations:
 * convert latitude and longitude to grid eastings and northings for the Ordnance Survey National Grid Transverse Mercator map projection - and vice versa
 
+## Installation
+
+Via Clojars: http://clojars.org/geocoordinates
+
+[![Clojars Project](http://clojars.org/geocoordinates/latest-version.svg)](http://clojars.org/geocoordinates)
+
 ## Usage
 
 The main conversion functions are provided by the ```geocoordinates.core``` namespace.
