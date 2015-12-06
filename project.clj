@@ -1,4 +1,4 @@
-(defproject geocoordinates "0.1.0-SNAPSHOT"
+(defproject geocoordinates "0.1.0"
   :description "A Clojure library for carrying out common calculations with geographical coordinates."
   :url "http://github.com/dilico/geocoordinates"
   :author "dilico"
