@@ -43,6 +43,30 @@ To convert from latitude and longitude to easting and northing for the Ordnance 
 (geo/latitude-longitude->easting-northing {:latitude 52.65757 :longitude 1.7179215} :national-grid)
 ```
 
+## Development
+
+To run unit tests:
+```shell
+clj -M:test
+```
+
+To create a jar file:
+
+```shell
+clj -T:build jar
+```
+
+To install into local maven repository:
+```shell
+clj -T:build install
+```
+
+To upload to clojars:
+```shell
+clj -T:build deploy
+```
+To deploy, environment variables CLOJARS_USERNAME and CLOJARS_PASSWORD must be set.
+
 ## License
 
 Copyright © 2015 dilico
