@@ -1,5 +1,4 @@
-(ns geocoordinates.math
-  (:refer-clojure :exclude [abs]))
+(ns geocoordinates.math)
 
 (def pi
   "Number pi."
