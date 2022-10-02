@@ -2,7 +2,7 @@
   (:require [clojure.tools.build.api :as b]
             [deps-deploy.deps-deploy :as dd]))
 
-(def lib 'com.github.dilico/geocoordinates)
+(def lib 'com.eldrix/geocoordinates)
 (def version (format "0.1.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
 (def jar-basis (b/create-basis {:project "deps.edn"}))

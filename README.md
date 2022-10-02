@@ -8,11 +8,14 @@ The guide also explains the limitations of this type of datum transformation, in
 Available calculations:
 * convert latitude and longitude to grid eastings and northings for the Ordnance Survey National Grid Transverse Mercator map projection - and vice versa
 
+This is a fork of https://github.com/dilico/geocoordinates and will be removed if the original
+repository is updated. 
+
 ## Installation
 
-Via Clojars: http://clojars.org/geocoordinates
+Via Clojars: [https://clojars.org/com.eldrix/geocoordinates](https://clojars.org/com.eldrix/geocoordinates)
 
-[![Clojars Project](http://clojars.org/geocoordinates/latest-version.svg)](http://clojars.org/geocoordinates)
+[![Clojars Project](https://img.shields.io/clojars/v/com.eldrix/geocoordinates.svg)](https://clojars.org/com.eldrix/geocoordinates)
 
 ## Usage
 
