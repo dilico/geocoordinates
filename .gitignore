@@ -4,7 +4,7 @@ pom.xml.asc
 *jar
 *.class
 
-# Leiningen
+# Clojure
 /classes
 /lib
 /native
@@ -15,6 +15,7 @@ pom.xml.asc
 .lein-env
 .lein-repl-history
 .nrepl-port
+.clj-kondo
 
 # Temp Files
 *.orig
@@ -23,6 +24,9 @@ pom.xml.asc
 .*.swo
 *.tmp
 *.bak
+.cpcache
+.idea
+*.iml
 
 # OS X
 .DS_Store
