@@ -20,10 +20,10 @@
                     :version   version
                     :basis     jar-basis
                     :src-dirs  ["src"]
-                    :scm       {:url                 "https://github.com/dilico/geocoordinates"
+                    :scm       {:url                 "https://github.com/wardle/geocoordinates"
                                 :tag                 (str "v" version)
-                                :connection          "scm:git:git://github.com/dilico/geocoordinates.git"
-                                :developerConnection "scm:git:ssh://git@github.com/dilico/geocoordinates.git"}})
+                                :connection          "scm:git:git://github.com/wardle/geocoordinates.git"
+                                :developerConnection "scm:git:ssh://git@github.com/wardle/geocoordinates.git"}})
       (b/copy-dir {:src-dirs   ["src" "resources"]
                    :target-dir class-dir})
       (b/jar {:class-dir class-dir
