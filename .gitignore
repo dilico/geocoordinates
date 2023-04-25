@@ -23,6 +23,9 @@ pom.xml.asc
 .*.swo
 *.tmp
 *.bak
+*.iml
+.cpcache
+.idea
 
 # OS X
 .DS_Store
